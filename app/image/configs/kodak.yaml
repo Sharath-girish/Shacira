@@ -1,0 +1,78 @@
+# Copyright (c) 2022, NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
+#
+# NVIDIA CORPORATION & AFFILIATES and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION & AFFILIATES is strictly prohibited.
+
+logging:
+    exp_name: 'test-kodak'
+    log_every: 1000
+
+dataset:
+    dataloader_num_workers: 1
+    num_samples: -1
+    sample_mode: 'full'
+
+nef:
+    hidden_dim: 16
+    num_layers: 1
+    pos_embedder: 'none'
+    activation_type: 'relu'
+    position_input: False
+
+grid:
+    grid_type: 'LatentGrid'
+    interpolation_type: 'linear'
+    multiscale_type: 'cat'
+    feature_dim: 1
+    feature_std: 0.1
+    feature_bias: 0.0
+    num_lods: 24
+    codebook_bitwidth: 11
+    tree_type: 'geometric'
+    min_grid_res: 16
+    max_grid_res: 512
+    blas_level: 7
+    init_grid: 'uniform'
+
+latent_decoder:
+    ldecode_enabled: True
+    ldecode_type: 'single'
+    use_sga: True
+    diff_sampling: True
+    use_shift: True
+    ldecode_matrix: 'sq'
+    latent_dim: 1
+    norm: 'max'
+    norm_every: 10
+    ldec_std: 0.1
+    decay_period: 0.9
+    temperature: 0.1
+
+entropy_reg:
+    num_prob_layers: 2
+    entropy_reg: 1.0e-3
+    entropy_reg_end: 1.0e-4
+    entropy_reg_sched: 'cosine'
+    noise_freq: 1
+
+optimizer:
+    disable_amp: True
+    disable_scaler: True
+    optimizer_type: 'adam'
+    lr: 0.001
+    grid_lr: 0.02
+    scale_grid_lr: 'none'
+    ldec_lr: 0.01
+    weight_decay: 0.0
+    weight_decay_decoder: 0.01
+
+trainer:
+    epochs: 60000
+    batch_size: 1
+    model_format: 'full'  # If loading a pretrained pipeline, 'full' = torch.load instead of torch.load_state_dict
+    valid_every: -1
+    save_every: 5000
+    render_tb_every: -1

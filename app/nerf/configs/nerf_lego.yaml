@@ -1,0 +1,75 @@
+# Copyright (c) 2022, NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
+#
+# NVIDIA CORPORATION & AFFILIATES and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION & AFFILIATES is strictly prohibited.
+
+parent: 'nerf_base.yaml'
+
+dataset:
+    multiview_dataset_format: 'standard'
+    mip: 0
+    bg_color: 'white'
+    num_rays_sampled_per_img: 4096
+    dataset_num_workers: 32
+
+tracer:
+    raymarch_type: 'ray'
+    num_steps: 2048
+
+grid:
+    grid_type: 'LatentGrid'
+    interpolation_type: 'linear'
+    multiscale_type: 'cat'
+    feature_dim: 4
+    feature_std: 0.02
+    feature_bias: 0.0
+    num_lods: 24
+    codebook_bitwidth: 19
+    tree_type: 'geometric'
+    min_grid_res: 16
+    max_grid_res: 512
+    blas_level: 7
+    init_grid: 'normal'
+
+optimizer:
+    optimizer_type: 'adam'
+    lr: 0.0005
+    grid_lr: 0.02
+    scale_grid_lr: 'div'
+    ldec_lr: 0.01
+    ldec_lr_warmup: 5
+
+latent_decoder:
+    ldec_std: 0.1
+    ldecode_type: 'single'
+    diff_sampling: True
+
+nef:
+    hidden_dim: 128
+    num_layers: 1
+
+entropy_reg:
+    num_prob_layers: 1
+    entropy_reg: 1.0e-4
+    entropy_reg_end: 1.0e-4
+    entropy_reg_sched: 'cosine'
+    noise_freq: 1
+
+optimizer:
+    weight_decay_decoder: 0.0
+
+latent_decoder:
+    ldecode_enabled: True
+    use_shift: True
+    use_sga: True
+    decay_period: 0.9
+    temperature: 1.0
+    latent_dim: 1
+    
+trainer:
+    prune_every: 100 # iterations
+    epochs: 300
+    valid_every: 300

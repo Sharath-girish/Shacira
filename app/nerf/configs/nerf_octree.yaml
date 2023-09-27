@@ -1,0 +1,19 @@
+# Copyright (c) 2022, NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
+#
+# NVIDIA CORPORATION & AFFILIATES and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION & AFFILIATES is strictly prohibited.
+
+parent: 'nerf_base.yaml'
+
+grid:
+    grid_type: 'OctreeGrid'
+    interpolation_type: 'linear'
+    multiscale_type: 'sum'
+    feature_dim: 5
+    feature_std: 0.01
+    feature_bias:  0.0
+    base_lod: 5
+    num_lods: 4
