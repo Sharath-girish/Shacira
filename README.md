@@ -1,6 +1,6 @@
 # SHACIRA: Scalable HAsh-grid Compression for Implicit Neural Representations (ICCV 2023)
 
-Official code for our paper <br>
+Official code for our [paper](https://openaccess.thecvf.com/content/ICCV2023/papers/Girish_SHACIRA_Scalable_HAsh-grid_Compression_for_Implicit_Neural_Representations_ICCV_2023_paper.pdf) <br>
 **SHACIRA: Scalable HAsh-grid Compression for Implicit Neural Representations** <br>
 Sharath Girish, Abhinav Shrivastava, Kamal Gupta <br>
 University of Maryland, College Park <br>
