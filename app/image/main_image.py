@@ -42,7 +42,7 @@ def parse_args():
                         help='Path to config file to replace defaults.')
     parser.add_argument('--profile', action='store_true',
                         help='Enable NVTX profiling')
-    parser.add_argument('--seed', type=int,
+    parser.add_argument('--seed', type=int, default=0,
                         help='Random seed. (Not implemented)')
 
     log_group = parser.add_argument_group('logging')

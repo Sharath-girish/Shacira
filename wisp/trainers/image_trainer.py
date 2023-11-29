@@ -303,7 +303,8 @@ class ImageTrainer(BaseTrainer):
         # Best state is stored at end of validation otherwise
         if self.train_dataset.static_coords and rgb_loss < self.best_state['rgb_loss'] and not self.metrics_only:
             H,W = self.train_dataset.image_size
-            pred_image = torch.clamp(pred.detach().cpu().reshape(H,W,3)*255,0.,255.)\
+            sorted_image = pred.detach().cpu()[torch.argsort(self.train_dataset.shuffle_idx)]
+            pred_image = torch.clamp(sorted_image.reshape(H,W,3)*255,0.,255.)\
                                      .numpy().astype(np.uint8)
             self.best_state['pred'] = pred_image
 
