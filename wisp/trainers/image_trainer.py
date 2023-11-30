@@ -28,7 +28,8 @@ from wisp.models.grids import LatentGrid, HashGrid, CodebookOctreeGrid
 from wisp.models.latent_decoders import LatentDecoder, MultiLatentDecoder
 
 os.environ["OPENCV_IO_MAX_IMAGE_PIXELS"] = pow(2,40).__str__()
-
+def print_kwargs(**kwargs):
+    print(kwargs)
 
 class ImageTrainer(BaseTrainer):
 
@@ -289,10 +290,10 @@ class ImageTrainer(BaseTrainer):
                 decoder = self.pipeline.nef.grid.latent_dec
                 latents = self.pipeline.nef.grid.codebook
                 if self.extra_args["norm"] == "max":
-                    decoder.div = torch.max(torch.abs(latents.min(dim=0,keepdim=True)[0]),\
-                                            torch.abs(latents.max(dim=0,keepdim=True)[0]))
+                    decoder.div.data = torch.max(torch.abs(latents.min(dim=0,keepdim=False)[0]),\
+                                            torch.abs(latents.max(dim=0,keepdim=False)[0]))
                 elif self.extra_args["norm"] == "std":
-                    decoder.div = latents.std(dim=0,keepdim=True)
+                    decoder.div.data = latents.std(dim=0,keepdim=False)
 
         pred = self.pipeline.nef(coords=coords, channels=["rgb"])[0]
         res = 1.0
@@ -583,6 +584,10 @@ class ImageTrainer(BaseTrainer):
             self.pipeline.load_state_dict(state["model"])
             self.optimizer.load_state_dict(state["optimizer"])
             self.scene_state.optimization = state['opt_state']
+            self.start_iteration = (self.epoch - 1) * self.iterations_per_epoch + 1
             log.info("Found saved state. Resuming training from epoch {}".format(self.epoch))
         else:
             log.info("No saved state found!")
+
+    def is_first_iteration(self):
+        return self.total_iterations == (self.start_iteration+1)

@@ -108,7 +108,7 @@ class MultiLatentDecoder(Module):
         self.channels = feature_dim
         self.latent_dim = latent_dim
         self.norm = norm
-        self.div = 1 if norm == 'none' else None
+        self.div = nn.Parameter(torch.ones(latent_dim),requires_grad=False)
         self.num_layers_dec =  num_layers_dec
         if num_layers_dec>0:
             if hidden_dim_dec == 0:

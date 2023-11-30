@@ -30,6 +30,7 @@ from PIL import Image
 class MultiviewTrainer(BaseTrainer):
 
     def __init__(self, **kwargs):
+        log.info(f'Info: \n{kwargs["info"]}')
         super().__init__(**kwargs)
 
         # Update optimization state about the current train set and val set used

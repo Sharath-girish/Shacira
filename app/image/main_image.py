@@ -531,7 +531,8 @@ if __name__ == "__main__":
     start_image_idx = 0
     if args.resume and os.path.exists(os.path.join(args.log_dir, args.exp_name, "resume_state.pth")):
         state = torch.load(os.path.join(args.log_dir, args.exp_name, "resume_state.pth"))
-        start_image_idx = state["image_idx"]
+        start_image_idx = state["image_idx"]-1
+
     train_dataset.image_idx = start_image_idx
 
     # Default TensorBoard Logging
@@ -563,11 +564,20 @@ if __name__ == "__main__":
         pipeline = load_neural_pipeline(args=args, args_dict=args_dict, dataset=train_dataset, device=device)
         scene_state = ImageState()   # Joint trainer / app state
         # Create trainer for current image
+        if image_idx == start_image_idx:
+            log.info(f'Info: \n{args_to_log_format(args_dict)}')
         trainer = load_trainer(pipeline=pipeline, train_dataset=train_dataset, validation_dataset=validation_dataset,
                                device=device, scene_state=scene_state, args=args, args_dict=args_dict,
                                writer=writer)
-        if args.resume and os.path.exists(os.path.join(args.log_dir, args.exp_name, "resume_state.pth")):
-            trainer.resume_state()
+        
+        # Only resume state for first image from checkpoint
+        if args.resume and os.path.exists(os.path.join(args.log_dir, args.exp_name, "resume_state.pth")) and image_idx==start_image_idx:
+            # state["epoch"] == args.epochs indicates training is complete for previous image, do not load 
+            if state["epoch"] != args.epochs:
+                trainer.resume_state()
+            if os.path.exists(os.path.join(args.log_dir, args.exp_name, 'metrics.json')):
+                with open(os.path.join(args.log_dir, args.exp_name, 'metrics.json'), 'r') as f:
+                    avg_metrics = json.load(f)
             
         if args.valid_only:
             if args.valid_only_load_path:
@@ -597,19 +607,22 @@ if __name__ == "__main__":
             else:
                 avg_metrics = {k:avg_metrics[k]+[v] for k,v in trainer.best_state.items()}
 
-            avg_metrics = {k:sum(avg_metrics[k])/len(avg_metrics[k]) for k in avg_metrics}
-            log_text = 'Metrics (avg): '
-            for k,v in avg_metrics.items():
-                log_text += f'{k}:{v} |'
-            log.info(log_text)
-
             with open(os.path.join(args.log_dir, args.exp_name, 'metrics.json'), 'w') as f:
                 json.dump(avg_metrics, f)
-        
-            if args.wandb_project is not None:
-                wandb.run.summary({f"Average/{k}": v for k,v in avg_metrics.items()})
 
-            open(os.path.join(trainer.log_dir, 'complete'), "a").close()
+    avg_metrics = {k:sum(avg_metrics[k])/len(avg_metrics[k]) for k in avg_metrics}
+    log_text = 'Metrics (avg): '
+    for k,v in avg_metrics.items():
+        log_text += f'{k}:{v} |'
+    log.info(log_text)
+
+    with open(os.path.join(args.log_dir, args.exp_name, 'metrics.json'), 'w') as f:
+        json.dump(avg_metrics, f)
+
+    if args.wandb_project is not None:
+        wandb.run.summary({f"Average/{k}": v for k,v in avg_metrics.items()})
+
+    open(os.path.join(trainer.log_dir, 'complete'), "a").close()
     if args.copy_local:
         shutil.rmtree(args.dataset_path)
 

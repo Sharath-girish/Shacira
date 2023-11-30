@@ -110,7 +110,6 @@ class BaseTrainer(ABC):
             writer (SummaryWriter): Tensorboard writer for logging, initialized if None
 
         """
-        log.info(f'Info: \n{info}')
         log.info(f'Training on {extra_args["dataset_path"]}')
 
         # initialize scene_state
@@ -158,6 +157,7 @@ class BaseTrainer(ABC):
                                                      {'temperature': extra_args["temperature"], 'decay_period': extra_args["decay_period"]})
         # Training params
         self.epoch = 1
+        self.start_iteration = 0
         self.iteration = 0
         self.max_epochs = num_epochs
         self.batch_size = batch_size
@@ -403,7 +403,7 @@ class BaseTrainer(ABC):
             "epoch": self.epoch,
             "model": self.pipeline.state_dict(),
             "optimizer": self.optimizer.state_dict(),
-            'scene_state': self.scene_state
+            'scene_state': self.scene_state,
         }
         torch.save(state, os.path.join(self.log_dir, "resume_state.pth"))
 
